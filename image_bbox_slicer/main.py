@@ -576,7 +576,7 @@ class Slicer(object):
             next(read_csv, None)
             mapping = random.choice(list(read_csv))
 
-            src_file = mapping[0]
+            src_file = mapping[0] + '.pdf.p000'
             tile_files = mapping[1:]
 
             plot_image_boxes(self.IMG_SRC, self.ANN_SRC, src_file)

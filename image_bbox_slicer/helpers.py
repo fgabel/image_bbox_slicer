@@ -13,8 +13,8 @@ import matplotlib.patches as patches
 import xml.etree.ElementTree as ET
 from math import sqrt, ceil, floor
 
-
 IMG_FORMAT_LIST = ['jpg', 'jpeg', 'png', 'tiff', 'exif', 'bmp']
+
 
 # Source : Sam Dobson
 # https://github.com/samdobson/image_slicer
@@ -37,6 +37,7 @@ def calc_columns_rows(n):
     num_columns = int(ceil(sqrt(n)))
     num_rows = int(ceil(n / float(num_columns)))
     return (num_columns, num_rows)
+
 
 # Source : Sam Dobson
 # https://github.com/samdobson/image_slicer
@@ -149,7 +150,8 @@ def validate_file_names(img_src, ann_src):
 
     if not (imgs == anns):
         raise Exception(
-            'Each image in `{}` must have its corresponding XML file in `{}` with the same file name.'.format(img_src, ann_src))
+            'Each image in `{}` must have its corresponding XML file in `{}` with the same file name.'.format(img_src,
+                                                                                                              ann_src))
 
 
 def validate_overlap(tile_overlap):
@@ -171,7 +173,8 @@ def validate_overlap(tile_overlap):
     """
     if not (0.0 <= tile_overlap <= 1.0):
         raise ValueError(
-            'Tile overlap percentage should be between 0 and 1, inclusive. The value provided was {}'.format(tile_overlap))
+            'Tile overlap percentage should be between 0 and 1, inclusive. The value provided was {}'.format(
+                tile_overlap))
 
 
 def validate_tile_size(tile_size, img_size=None):
@@ -216,7 +219,7 @@ def validate_tile_size(tile_size, img_size=None):
 
 def validate_new_size(new_size):
     """Validates `new_size` argument.
-    
+
     Parameters
     ----------
     new_size : tuple
@@ -309,7 +312,7 @@ def extract_from_xml(file):
         difficult = '0'
         if obj.find('pose') is not None:
             pose = obj.find('pose').text
-            
+
         if obj.find('truncated') is not None:
             truncated = obj.find('truncated').text
 
@@ -367,23 +370,23 @@ def plot_image_boxes(img_path, ann_path, file_name):
         tree = ET.parse(ann_path + '/' + file_name + '.xml')
         root = tree.getroot()
 
-        im = Image.open(img_path + '/' + file_name + '.jpg')
+        im = Image.open(img_path + '/' + file_name + '.png')
         im = np.array(im, dtype=np.uint8)
 
         rois = []
         for member in root.findall('object'):
-            rois.append((int(member[4][0].text), int(member[4][1].text),
-                         int(member[4][2].text), int(member[4][3].text)))
+            rois.append((int(float(member[2][0].text)), int(float(member[2][1].text)),
+                         int(float(member[2][2].text)), int(float(member[2][3].text))))
 
         # Create figure and axes
         fig, ax = plt.subplots(1, figsize=(10, 10))
 
         # Display the image
-        ax.imshow(im)
+        ax.imshow(im, cmap='gray')
 
         for roi in rois:
             # Create a Rectangle patch
-            rect = patches.Rectangle((roi[0], roi[1]), roi[2]-roi[0], roi[3]-roi[1],
+            rect = patches.Rectangle((roi[0], roi[1]), roi[2] - roi[0], roi[3] - roi[1],
                                      linewidth=3, edgecolor='b', facecolor='none')
 
             # Add the patch to the Axes
@@ -401,20 +404,20 @@ def plot_image_boxes(img_path, ann_path, file_name):
             tree = ET.parse(ann_path + '/' + file + '.xml')
             root = tree.getroot()
 
-            im = Image.open(img_path + '/' + file + '.jpg')
+            im = Image.open(img_path + '/' + file + '.png')
             im = np.array(im, dtype=np.uint8)
 
             rois = []
             for member in root.findall('object'):
-                rois.append((int(member[4][0].text), int(member[4][1].text),
-                             int(member[4][2].text), int(member[4][3].text)))
+                rois.append((int(float(member[4][0].text)), int(float(member[4][1].text)),
+                             int(float(member[4][2].text)), int(float(member[4][3].text))))
 
             # Display the image at the right position
             ax[pos[idx][0], pos[idx][1]].imshow(im)
 
             for roi in rois:
                 # Create a Rectangle patch
-                rect = patches.Rectangle((roi[0], roi[1]), roi[2]-roi[0], roi[3]-roi[1],
+                rect = patches.Rectangle((roi[0], roi[1]), roi[2] - roi[0], roi[3] - roi[1],
                                          linewidth=3, edgecolor='b', facecolor='none')
 
                 # Add the patch to the Axes
